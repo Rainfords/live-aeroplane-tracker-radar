@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Aircraft Radar</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="control-bar">
+    <div id="branding">&#9992; LIVE RADAR</div>
+
+    <div id="filter-group">
+      <label for="filter-region">REGION</label>
+      <select id="filter-region">
+        <option value="nz">New Zealand</option>
+        <option value="au">Australia</option>
+        <option value="uk">UK / Ireland</option>
+        <option value="eu">Europe</option>
+        <option value="us">USA</option>
+        <option value="world">World</option>
+      </select>
+    </div>
+
+    <div id="alt-legend">
+      <span class="legend-item" style="color:#ff4444">&#9650; &lt;1k</span>
+      <span class="legend-item" style="color:#ff8800">&#9650; 1-10k</span>
+      <span class="legend-item" style="color:#ffcc00">&#9650; 10-20k</span>
+      <span class="legend-item" style="color:#aaff44">&#9650; 20-30k</span>
+      <span class="legend-item" style="color:#00ff41">&#9650; 30k+</span>
+      <span class="legend-item" style="color:#ff9900">&#9632; gnd</span>
+    </div>
+
+    <div id="btn-group">
+      <button id="fetch-btn">FETCH</button>
+      <button id="auto-btn">AUTO &#9654;</button>
+      <button id="radar-open-btn">&#9678; SCOPE</button>
+    </div>
+  </header>
+
+  <div id="map"></div>
+
+  <footer id="status-bar">
+    <span id="status-source">OpenSky Network</span>
+    <span id="status-flights">Flights: &mdash;</span>
+    <span id="status-time">Updated: &mdash;</span>
+    <span id="status-countdown" style="display:none">Next: 30s</span>
+    <span id="status-message"></span>
+  </footer>
+
+  <!-- Radar scope overlay -->
+  <div id="radar-overlay">
+    <div id="radar-panel">
+      <div id="radar-header">
+        <span id="radar-title">&#9678; RADAR SCOPE</span>
+        <span id="radar-region-name"></span>
+        <button id="radar-locate-btn">&#8853; MY POS</button>
+        <button id="radar-close-btn">&#10005; CLOSE</button>
+      </div>
+      <canvas id="radar-canvas"></canvas>
+      <div id="radar-footer">
+        <span class="radar-label">RANGE</span>
+        <div id="radar-range-btns">
+          <button class="range-btn" data-range="200">200</button>
+          <button class="range-btn active" data-range="500">500</button>
+          <button class="range-btn" data-range="1000">1000</button>
+          <button class="range-btn" data-range="2000">2000 KM</button>
+        </div>
+        <span id="radar-count">0 targets</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/radar.js" defer></script>
+</body>
+</html>

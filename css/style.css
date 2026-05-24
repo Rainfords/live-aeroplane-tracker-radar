@@ -1,0 +1,471 @@
+:root {
+  --color-bg: #080f08;
+  --color-panel: #0c1a0c;
+  --color-green: #00ff41;
+  --color-green-text: #80cc80;
+  --color-green-dim: #1a4a1a;
+  --color-green-glow: rgba(0, 255, 65, 0.4);
+  --color-amber: #ff9900;
+  --color-danger: #ff3333;
+  --color-success: #00ff41;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-green-text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Control bar ── */
+
+#control-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  height: 56px;
+  flex-shrink: 0;
+  background: var(--color-panel);
+  border-bottom: 1px solid var(--color-green);
+  box-shadow: 0 2px 16px var(--color-green-glow);
+}
+
+#branding {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-green);
+  text-shadow: 0 0 8px var(--color-green);
+  letter-spacing: 3px;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+#filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#alt-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border-left: 1px solid var(--color-green-dim);
+  border-right: 1px solid var(--color-green-dim);
+}
+
+.legend-item {
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+#btn-group {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+label {
+  color: var(--color-green-text);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+input, select {
+  background: var(--color-bg);
+  color: var(--color-green);
+  border: 1px solid var(--color-green-dim);
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  outline: none;
+  text-transform: uppercase;
+  transition: border-color 0.15s;
+}
+
+input:focus, select:focus {
+  border-color: var(--color-green);
+  box-shadow: 0 0 6px var(--color-green-glow);
+}
+
+select {
+  cursor: pointer;
+}
+
+select option {
+  background: var(--color-panel);
+}
+
+button {
+  background: transparent;
+  color: var(--color-green);
+  border: 1px solid var(--color-green);
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+button:hover {
+  background: var(--color-green);
+  color: var(--color-bg);
+  box-shadow: 0 0 10px var(--color-green-glow);
+}
+
+button:active {
+  opacity: 0.8;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: transparent;
+  color: var(--color-green-dim);
+  box-shadow: none;
+}
+
+#fetch-btn {
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+#auto-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+#auto-btn.active {
+  background: var(--color-green);
+  color: var(--color-bg);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 6px var(--color-green-glow); }
+  50%       { box-shadow: 0 0 18px rgba(0, 255, 65, 0.8); }
+}
+
+/* ── Map ── */
+
+#map {
+  flex: 1;
+  position: relative;
+  background: var(--color-bg);
+}
+
+#map::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.12) 3px,
+    rgba(0, 0, 0, 0.12) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ── Status bar ── */
+
+#status-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 16px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--color-panel);
+  border-top: 1px solid var(--color-green-dim);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+#status-source {
+  color: var(--color-green-text);
+  white-space: nowrap;
+  opacity: 0.5;
+  font-size: 10px;
+}
+
+#status-countdown {
+  color: var(--color-green);
+  white-space: nowrap;
+  text-shadow: 0 0 4px var(--color-green-glow);
+}
+
+#status-flights,
+#status-time {
+  color: var(--color-green-text);
+  white-space: nowrap;
+}
+
+#status-message {
+  color: var(--color-green-text);
+  flex: 1;
+}
+
+#status-message.error {
+  color: var(--color-danger);
+  text-shadow: 0 0 4px var(--color-danger);
+}
+
+#status-message.warning {
+  color: var(--color-amber);
+}
+
+#status-message.success {
+  color: var(--color-green);
+  text-shadow: 0 0 4px var(--color-green-glow);
+}
+
+
+/* ── Leaflet popup override ── */
+
+.radar-popup .leaflet-popup-content-wrapper {
+  background: var(--color-panel);
+  border: 1px solid var(--color-green);
+  border-radius: 2px;
+  box-shadow: 0 0 12px var(--color-green-glow);
+  color: var(--color-green-text);
+  font-family: var(--font-mono);
+  padding: 0;
+}
+
+.radar-popup .leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+.radar-popup .leaflet-popup-tip-container {
+  display: none;
+}
+
+.radar-popup .leaflet-popup-close-button {
+  color: var(--color-green) !important;
+  font-size: 16px;
+  padding: 4px 6px !important;
+}
+
+.flight-popup {
+  padding: 10px 14px;
+  min-width: 180px;
+}
+
+.popup-callsign {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-green);
+  text-shadow: 0 0 6px var(--color-green);
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+
+.popup-airline {
+  font-size: 11px;
+  color: var(--color-green-text);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.popup-route {
+  font-size: 13px;
+  color: var(--color-green);
+  margin-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.popup-divider {
+  border: none;
+  border-top: 1px solid var(--color-green-dim);
+  margin-bottom: 8px;
+}
+
+.popup-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+
+.popup-detail span:first-child {
+  color: var(--color-green-text);
+  opacity: 0.7;
+  text-transform: uppercase;
+}
+
+.popup-detail span:last-child {
+  color: var(--color-green);
+}
+
+/* ── Aircraft icon ── */
+
+.aircraft-icon {
+  background: none;
+  border: none;
+}
+
+/* ── Leaflet controls dark override ── */
+
+.leaflet-bar a {
+  background: var(--color-panel) !important;
+  color: var(--color-green) !important;
+  border-color: var(--color-green-dim) !important;
+  font-family: var(--font-mono);
+}
+
+.leaflet-bar a:hover {
+  background: var(--color-green) !important;
+  color: var(--color-bg) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(8, 15, 8, 0.8) !important;
+  color: var(--color-green-dim) !important;
+  font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-green-dim) !important;
+}
+
+/* ── Radar scope overlay ── */
+
+#radar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s, visibility 0.25s;
+}
+
+#radar-overlay.radar-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#radar-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: scale(0.88);
+  transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+#radar-overlay.radar-visible #radar-panel {
+  transform: scale(1);
+}
+
+#radar-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 0 2px;
+}
+
+#radar-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-green);
+  text-shadow: 0 0 10px var(--color-green);
+  letter-spacing: 3px;
+}
+
+#radar-region-name {
+  flex: 1;
+  color: var(--color-green-text);
+  font-size: 11px;
+  opacity: 0.65;
+  letter-spacing: 1px;
+}
+
+#radar-canvas {
+  display: block;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px #00ff41,
+    0 0 40px rgba(0, 255, 65, 0.35),
+    0 0 80px rgba(0, 255, 65, 0.15);
+}
+
+#radar-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.radar-label {
+  color: var(--color-green-text);
+  opacity: 0.6;
+  text-transform: uppercase;
+}
+
+#radar-range-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.range-btn {
+  padding: 3px 9px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.range-btn.active {
+  background: var(--color-green);
+  color: var(--color-bg);
+  box-shadow: 0 0 8px var(--color-green-glow);
+}
+
+#radar-count {
+  color: var(--color-green);
+  letter-spacing: 1px;
+  min-width: 80px;
+  text-align: right;
+}
+
+#radar-locate-btn.active {
+  background: rgba(80, 210, 255, 0.15);
+  color: rgb(80, 210, 255);
+  border-color: rgb(80, 210, 255);
+  box-shadow: 0 0 8px rgba(80, 210, 255, 0.4);
+}
