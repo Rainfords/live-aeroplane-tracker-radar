@@ -1,4 +1,5 @@
-const API_BASE = '/api/opensky';
+const isLocal  = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const API_BASE = isLocal ? '/api/opensky' : '/.netlify/functions/opensky';
 const AUTO_INTERVAL = 30; // seconds between auto-refreshes
 const TRAIL_MAX = 8;      // max position history points per aircraft
 
