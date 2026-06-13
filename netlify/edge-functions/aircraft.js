@@ -1,7 +1,7 @@
 export default async (request, context) => {
   const url = new URL(request.url);
-  const path = url.searchParams.get('path') || '/v2/aircraft';
-  const apiUrl = `https://api.adsb.lol${path}`;
+  const qs = url.searchParams.get('qs') || '';
+  const apiUrl = `https://opensky-network.org/api/states/all${qs ? '?' + qs : ''}`;
 
   try {
     const res  = await fetch(apiUrl);

@@ -2,12 +2,12 @@ const AUTO_INTERVAL = 30; // seconds between auto-refreshes
 const TRAIL_MAX = 8;      // max position history points per aircraft
 
 const REGIONS = {
-  nz:    { radius: 1500, view: { center: [-41.5, 172.8], zoom: 5 } },
-  au:    { radius: 2500, view: { center: [-25.0, 133.0], zoom: 4 } },
-  uk:    { radius:  700, view: { center: [54.0,   -2.0], zoom: 6 } },
-  eu:    { radius: 2500, view: { center: [50.0,   10.0], zoom: 4 } },
-  us:    { radius: 3500, view: { center: [39.0,  -98.0], zoom: 4 } },
-  world: { radius: null, view: { center: [20.0,    0.0], zoom: 2 } },
+  nz:    { bbox: { lamin: -48, lamax: -33, lomin: 165, lomax: 180 }, view: { center: [-41.5, 172.8], zoom: 5 } },
+  au:    { bbox: { lamin: -44, lamax: -10, lomin: 113, lomax: 154 }, view: { center: [-25.0, 133.0], zoom: 4 } },
+  uk:    { bbox: { lamin: 49,  lamax: 61,  lomin: -11, lomax: 3   }, view: { center: [54.0, -2.0],   zoom: 6 } },
+  eu:    { bbox: { lamin: 35,  lamax: 72,  lomin: -12, lomax: 45  }, view: { center: [50.0, 10.0],   zoom: 4 } },
+  us:    { bbox: { lamin: 24,  lamax: 50,  lomin: -126, lomax: -65 }, view: { center: [39.0, -98.0],  zoom: 4 } },
+  world: { bbox: null, view: { center: [20.0, 0.0], zoom: 2 } },
 };
 
 let map;
@@ -61,32 +61,32 @@ function getAltitudeColour(altitude, isGround) {
 
 function buildApiUrl() {
   const region = document.getElementById('filter-region').value;
-  const { radius, view } = REGIONS[region] || {};
-  const adsbPath = radius
-    ? `/v2/lat/${view.center[0]}/lon/${view.center[1]}/dist/${radius}`
-    : '/v2/aircraft';
+  const bbox = REGIONS[region]?.bbox;
+  const qs = bbox
+    ? `lamin=${bbox.lamin}&lamax=${bbox.lamax}&lomin=${bbox.lomin}&lomax=${bbox.lomax}`
+    : '';
   const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   return isLocal
-    ? `https://api.adsb.lol${adsbPath}`
-    : `/api/aircraft?path=${encodeURIComponent(adsbPath)}`;
+    ? `/api/opensky${qs ? '?' + qs : ''}`
+    : `/api/aircraft${qs ? '?qs=' + encodeURIComponent(qs) : ''}`;
 }
 
 function parseFlights(apiResponse) {
-  const aircraft = apiResponse?.ac;
-  if (!Array.isArray(aircraft)) return [];
-  return aircraft
-    .filter(a => a.lat != null && a.lon != null)
-    .map(a => ({
-      id:        a.hex,
-      callsign:  (a.flight || '').trim() || a.hex,
-      country:   a.r || '',
-      lat:       a.lat,
-      lng:       a.lon,
-      altitude:  a.alt_baro != null && a.alt_baro !== 'ground' ? Math.round(Number(a.alt_baro)) : null,
-      speed:     a.gs   != null ? Math.round(a.gs * 1.852) : null,
-      direction: a.track ?? null,
-      isGround:  a.alt_baro === 'ground' || a.on_ground === true,
-      vertRate:  a.baro_rate != null ? Math.round(a.baro_rate * 0.00508) : null,
+  const states = apiResponse?.states;
+  if (!Array.isArray(states)) return [];
+  return states
+    .filter(s => s[6] != null && s[5] != null)
+    .map(s => ({
+      id:        s[0],
+      callsign:  (s[1] || '').trim() || s[0],
+      country:   s[2] || '',
+      lat:       s[6],
+      lng:       s[5],
+      altitude:  s[7] != null ? Math.round(s[7] * 3.281) : null,
+      speed:     s[9] != null ? Math.round(s[9] * 3.6)   : null,
+      direction: s[10] ?? null,
+      isGround:  s[8]  || false,
+      vertRate:  s[11] ?? null,
     }));
 }
 
