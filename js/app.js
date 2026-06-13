@@ -62,9 +62,13 @@ function getAltitudeColour(altitude, isGround) {
 function buildApiUrl() {
   const region = document.getElementById('filter-region').value;
   const { radius, view } = REGIONS[region] || {};
-  if (!radius) return 'https://api.adsb.lol/v2/aircraft';
-  const [lat, lon] = view.center;
-  return `https://api.adsb.lol/v2/lat/${lat}/lon/${lon}/dist/${radius}`;
+  const adsbPath = radius
+    ? `/v2/lat/${view.center[0]}/lon/${view.center[1]}/dist/${radius}`
+    : '/v2/aircraft';
+  const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  return isLocal
+    ? `https://api.adsb.lol${adsbPath}`
+    : `/api/aircraft?path=${encodeURIComponent(adsbPath)}`;
 }
 
 function parseFlights(apiResponse) {
