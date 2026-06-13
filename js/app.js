@@ -1,22 +1,13 @@
-const isLocal  = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-const API_BASE = isLocal ? '/api/opensky' : 'https://opensky-network.org/api/states/all';
 const AUTO_INTERVAL = 30; // seconds between auto-refreshes
 const TRAIL_MAX = 8;      // max position history points per aircraft
 
 const REGIONS = {
-  nz:    { bbox: { lamin: -48, lamax: -33, lomin: 165, lomax: 180 }, view: { center: [-41.5, 172.8], zoom: 5 } },
-  au:    { bbox: { lamin: -44, lamax: -10, lomin: 113, lomax: 154 }, view: { center: [-25.0, 133.0], zoom: 4 } },
-  uk:    { bbox: { lamin: 49,  lamax: 61,  lomin: -11, lomax: 3   }, view: { center: [54.0, -2.0],   zoom: 6 } },
-  eu:    { bbox: { lamin: 35,  lamax: 72,  lomin: -12, lomax: 45  }, view: { center: [50.0, 10.0],   zoom: 4 } },
-  us:    { bbox: { lamin: 24,  lamax: 50,  lomin: -126, lomax: -65 }, view: { center: [39.0, -98.0],  zoom: 4 } },
-  world: { bbox: null, view: { center: [20.0, 0.0], zoom: 2 } },
-};
-
-// OpenSky state vector field indices
-const F = {
-  ICAO24: 0, CALLSIGN: 1, COUNTRY: 2,
-  LON: 5, LAT: 6, BARO_ALT: 7, ON_GROUND: 8,
-  VELOCITY: 9, TRUE_TRACK: 10, VERT_RATE: 11,
+  nz:    { radius: 1500, view: { center: [-41.5, 172.8], zoom: 5 } },
+  au:    { radius: 2500, view: { center: [-25.0, 133.0], zoom: 4 } },
+  uk:    { radius:  700, view: { center: [54.0,   -2.0], zoom: 6 } },
+  eu:    { radius: 2500, view: { center: [50.0,   10.0], zoom: 4 } },
+  us:    { radius: 3500, view: { center: [39.0,  -98.0], zoom: 4 } },
+  world: { radius: null, view: { center: [20.0,    0.0], zoom: 2 } },
 };
 
 let map;
@@ -40,7 +31,7 @@ function initMap() {
   );
 
   const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors | Flights: OpenSky Network',
+    attribution: '&copy; OpenStreetMap contributors | Flights: ADS-B Exchange / adsb.lol',
     maxZoom: 18,
   }).addTo(map);
 
@@ -70,28 +61,28 @@ function getAltitudeColour(altitude, isGround) {
 
 function buildApiUrl() {
   const region = document.getElementById('filter-region').value;
-  const bbox = REGIONS[region]?.bbox;
-  if (!bbox) return API_BASE;
-  const { lamin, lamax, lomin, lomax } = bbox;
-  return `${API_BASE}?lamin=${lamin}&lamax=${lamax}&lomin=${lomin}&lomax=${lomax}`;
+  const { radius, view } = REGIONS[region] || {};
+  if (!radius) return 'https://api.adsb.lol/v2/aircraft';
+  const [lat, lon] = view.center;
+  return `https://api.adsb.lol/v2/lat/${lat}/lon/${lon}/dist/${radius}`;
 }
 
 function parseFlights(apiResponse) {
-  const states = apiResponse?.states;
-  if (!Array.isArray(states)) return [];
-  return states
-    .filter(s => s[F.LAT] != null && s[F.LON] != null)
-    .map(s => ({
-      id:       s[F.ICAO24],
-      callsign: (s[F.CALLSIGN] || '').trim() || s[F.ICAO24],
-      country:  s[F.COUNTRY] || '',
-      lat:      s[F.LAT],
-      lng:      s[F.LON],
-      altitude: s[F.BARO_ALT]   != null ? Math.round(s[F.BARO_ALT] * 3.281) : null,
-      speed:    s[F.VELOCITY]   != null ? Math.round(s[F.VELOCITY]  * 3.6)   : null,
-      direction: s[F.TRUE_TRACK] ?? null,
-      isGround: s[F.ON_GROUND]  || false,
-      vertRate: s[F.VERT_RATE]  ?? null,
+  const aircraft = apiResponse?.ac;
+  if (!Array.isArray(aircraft)) return [];
+  return aircraft
+    .filter(a => a.lat != null && a.lon != null)
+    .map(a => ({
+      id:        a.hex,
+      callsign:  (a.flight || '').trim() || a.hex,
+      country:   a.r || '',
+      lat:       a.lat,
+      lng:       a.lon,
+      altitude:  a.alt_baro != null && a.alt_baro !== 'ground' ? Math.round(Number(a.alt_baro)) : null,
+      speed:     a.gs   != null ? Math.round(a.gs * 1.852) : null,
+      direction: a.track ?? null,
+      isGround:  a.alt_baro === 'ground' || a.on_ground === true,
+      vertRate:  a.baro_rate != null ? Math.round(a.baro_rate * 0.00508) : null,
     }));
 }
 
