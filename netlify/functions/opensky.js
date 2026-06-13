@@ -14,10 +14,11 @@ exports.handler = async (event) => {
       body,
     };
   } catch (err) {
+    console.error('opensky proxy error:', err);
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ error: err.message }),
+      body: JSON.stringify({ error: err.message, stack: err.stack }),
     };
   }
 };
