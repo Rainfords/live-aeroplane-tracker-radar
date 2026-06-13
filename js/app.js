@@ -59,16 +59,18 @@ function getAltitudeColour(altitude, isGround) {
 
 // ── API ───────────────────────────────────────────────────────
 
+const PROXY = 'https://aircraft-proxy.fly.dev';
+
 function buildApiUrl() {
   const region = document.getElementById('filter-region').value;
   const bbox = REGIONS[region]?.bbox;
   const qs = bbox
     ? `lamin=${bbox.lamin}&lamax=${bbox.lamax}&lomin=${bbox.lomin}&lomax=${bbox.lomax}`
     : '';
-  const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-  return isLocal
-    ? `/api/opensky${qs ? '?' + qs : ''}`
-    : `/api/aircraft${qs ? '?qs=' + encodeURIComponent(qs) : ''}`;
+  const base = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+    ? '/api/opensky'
+    : PROXY;
+  return `${base}${qs ? '?' + qs : ''}`;
 }
 
 function parseFlights(apiResponse) {
